@@ -10,11 +10,11 @@ PImage img;
 int w = 240;
 
 boolean hw = true;
-int convolutionHW = 4;
+int convolutionHW = 2;
 int currentconvolutionHW = 1;
 float[][] edgesColor = {{ -1, -1, -1 }, { -1,  9, -1 }, { -1, -1, -1 }};
 float[][] edgesBH =  {{ -1, -1, -1 }, { -1,  8, -1 }, {-1, -1, -1 }};
-float[][] filter = {{ -1, -1,  0 }, { -1, 0, 1 }, { 0, 1,  1}};
+float[][] emboss = {{ -1, -1,  0 }, { -1, 0, 1 }, { 0, 1,  1}};
 
 PShader selShader;
 
@@ -30,6 +30,7 @@ void setup() {
 
   edgesShader = loadShader("edgesfrag.glsl");
   embossShader = loadShader("embossfrag.glsl");
+  frameRate(1000);
 }
 
 void draw() {
@@ -39,6 +40,7 @@ void draw() {
 }
 
 void convolutionHW(){
+  resetShader();
   int xstart = constrain(mouseX - w/2, 0, img.width);
   int ystart = constrain(mouseY - w/2, 0, img.height);
   int xend = constrain(mouseX + w/2, 0, img.width);
@@ -77,19 +79,19 @@ color convolution(int x, int y, float[][] edgesColor, int matrixsize, PImage img
 
       switch(currentconvolutionHW){
         case 1:
-        rtotal += (red(img.pixels[loc]) * edgesColor[i][j]);
-        gtotal += (green(img.pixels[loc]) * edgesColor[i][j]);
-        btotal += (blue(img.pixels[loc]) * edgesColor[i][j]);
-        break;
-        case 2:
         rtotal += (red(img.pixels[loc]) * edgesBH[i][j]);
         gtotal += (green(img.pixels[loc]) * edgesBH[i][j]);
         btotal += (blue(img.pixels[loc]) * edgesBH[i][j]);
         break;
+        case 2:
+        rtotal += (red(img.pixels[loc]) * emboss[i][j]);
+        gtotal += (green(img.pixels[loc]) * emboss[i][j]);
+        btotal += (blue(img.pixels[loc]) * emboss[i][j]);
+        break;
         case 3:
-        rtotal += (red(img.pixels[loc]) * filter[i][j]);
-        gtotal += (green(img.pixels[loc]) * filter[i][j]);
-        btotal += (blue(img.pixels[loc]) * filter[i][j]);
+        rtotal += (red(img.pixels[loc]) * edgesColor[i][j]);
+        gtotal += (green(img.pixels[loc]) * edgesColor[i][j]);
+        btotal += (blue(img.pixels[loc]) * edgesColor[i][j]);
         break;
       }
     }
