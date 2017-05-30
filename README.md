@@ -1,3 +1,7 @@
 # Visual-Computing-UN
-Repository used for visual computing class in Universidad nacional de Colombia
-Contains a shaders workshop
+
+##Proscene workshop
+
+Repository used for visual computing class in Universidad Nacional de Colombia
+
+In this workshop is developed a Tetris game and it is going to be used proscene library.
