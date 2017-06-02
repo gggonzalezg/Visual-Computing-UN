@@ -7,7 +7,7 @@ CODE AVAILABLE HERE: https://processing.org/examples/convolution.html
 */
 
 PImage img;
-int w = 240;
+int w = 600;
 
 boolean hw = true;
 int convolutionHW = 2;
@@ -18,7 +18,7 @@ float[][] emboss = {{ -1, -1,  0 }, { -1, 0, 1 }, { 0, 1,  1}};
 
 PShader selShader;
 
-int convolutionSW = 2;
+int convolutionSW = 3;
 int currentconvolutionSW = 1;
 PShader bwShader;
 PShader edgesShader;
