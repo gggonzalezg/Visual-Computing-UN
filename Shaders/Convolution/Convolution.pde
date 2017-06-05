@@ -10,6 +10,9 @@ int w = 240;
 boolean hw = true;
 int currentconvolution = 1;
 PShader selShader;
+int fcount, lastm;
+float frate;
+int fint = 3;
 
 int convolutionSW = 3;
 float[][] edgesColor = {{ -1, -1, -1 }, { -1,  9, -1 }, { -1, -1, -1 }};
@@ -57,6 +60,16 @@ void convolutionHW(){
     }
   }
   updatePixels();
+  fcount += 1;
+  int m = millis();
+  if (m - lastm > 1000 * fint) {
+    frate = float(fcount) / fint;
+    fcount = 0;
+    lastm = m;
+    println("fps: " + frate);
+  }
+  fill(0);
+  text("fps: " + frate, 10, 20);
 }
 
 
@@ -105,4 +118,14 @@ color convolution(int x, int y, float[][] edgesColor, int matrixsize, PImage img
 void convolutionSW() {
   if(currentconvolution == 1) shader(edgesShader);
   else shader(embossShader);
+  fcount += 1;
+  int m = millis();
+  if (m - lastm > 1000 * fint) {
+    frate = float(fcount) / fint;
+    fcount = 0;
+    lastm = m;
+    println("fps: " + frate);
+  }
+  fill(0);
+  text("fps: " + frate, 10, 20);
 }
