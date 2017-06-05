@@ -13,10 +13,12 @@ int fcount, lastm;
 float frate;
 int fint = 3, n = 1;
 
-int convolutionSW = 3;
+int convolutionSW = 4;
 float[][] edgesColor = {{ -1, -1, -1 }, { -1,  9, -1 }, { -1, -1, -1 }};
 float[][] edgesBH =  {{ -1, -1, -1 }, { -1,  8, -1 }, {-1, -1, -1 }};
 float[][] emboss = {{ -1, -1,  0 }, { -1, 0, 1 }, { 0, 1,  1}};
+float[][] emboss5 = {{ -1, -1, -1, -1, 0}, { -1, -1, -1, 0, 1}, {-1, -1, 0, 1, 1}, {-1, 0, 1, 1, 1}, {0, 1, 1, 1, 1}};
+float[][] kernel;
 float factor = 1.0;
 float bias =1.0;
 
@@ -34,9 +36,38 @@ void setup() {
 
 void draw() {
   image(img, 0, 0);
+  switch(currentconvolution){
+    case 1:
+    kernel= edgesBH;
+    factor = 1.0;
+    bias = 1.0;
+    break;
+    case 2:
+    kernel= emboss;
+    factor = 1.0;
+    bias = 128.0;
+    break;
+    case 3:
+    kernel= edgesColor;
+    factor = 1.0;
+    bias = 1.0;
+    break;
+    case 4:
+    kernel= emboss5;
+    factor = 1.0;
+    bias = 128.0;
+    break;
+  }
+
   if(applyFilter){
-    if(sw) convolutionSW();
-    else convolutionHW();
+    if(sw){
+      for (int i = 0 ; i < n; i++)
+        convolutionSW();
+    }
+    else{
+      for (int i = 0 ; i < n; i++)
+        convolutionHW();
+    }
   }
 }
 
@@ -47,6 +78,12 @@ void keyPressed() {
   }
   if(key == 's' || key == 'S')
     sw = !sw;
+  if(key == 'a' || key == 'A')
+    n++;
+  if(key == 'd' || key == 'D')
+    n--;
+  if(key == 'r' || key == 'R')
+    n = 1;
 }
 
 void mousePressed() {
@@ -55,7 +92,7 @@ void mousePressed() {
 
 void convolutionSW(){
   resetShader();
-  int matrixsize = 3;
+  int matrixsize = kernel.length;
   loadPixels();
   for (int x = 0; x < img.width; x++) {
     for (int y = 0; y < img.height; y++ ) {
@@ -71,7 +108,7 @@ void convolutionSW(){
     frate = float(fcount) / fint;
     fcount = 0;
     lastm = m;
-    println("fps: " + frate);
+    println("fps: " + frate + "  It: " + n + "  Software(" + currentconvolution + ")");
   }
 }
 
@@ -87,29 +124,9 @@ color convolution(int x, int y, float[][] edgesColor, int matrixsize, PImage img
       int loc = xloc + img.width*yloc;
       loc = constrain(loc,0,img.pixels.length-1);
 
-      switch(currentconvolution){
-        case 1:
-        rtotal +=  (red(img.pixels[loc]) * edgesBH[i][j]);
-        gtotal +=  (green(img.pixels[loc]) * edgesBH[i][j]);
-        btotal +=  (blue(img.pixels[loc]) * edgesBH[i][j]);
-        factor = 1.0;
-        bias = 1.0;
-        break;
-        case 2:
-        rtotal += (red(img.pixels[loc]) * emboss[i][j]);
-        gtotal += (green(img.pixels[loc]) * emboss[i][j]);
-        btotal += (blue(img.pixels[loc]) * emboss[i][j]);
-        factor = 1.0;
-        bias = 128.0;
-        break;
-        case 3:
-        rtotal += (red(img.pixels[loc]) * edgesColor[i][j]);
-        gtotal += (green(img.pixels[loc]) * edgesColor[i][j]);
-        btotal += (blue(img.pixels[loc]) * edgesColor[i][j]);
-        factor = 1.0;
-        bias = 1.0;
-        break;
-      }
+      rtotal +=  (red(img.pixels[loc]) * kernel[i][j]);
+      gtotal +=  (green(img.pixels[loc]) * kernel[i][j]);
+      btotal +=  (blue(img.pixels[loc]) * kernel[i][j]);
     }
   }
   rtotal = constrain(factor*rtotal+bias, 0, 255);
@@ -121,26 +138,28 @@ color convolution(int x, int y, float[][] edgesColor, int matrixsize, PImage img
 void convolutionHW() {
   if(currentconvolution == 1){
     filter(edgesShader);
+
     fcount += 1;
     int m = millis();
     if (m - lastm > 1000 * fint) {
       frate = float(fcount) / fint;
       fcount = 0;
       lastm = m;
-      println("fps: " + frate);
+      println("fps: " + frate + "  It: " + n + "  Hardware(" + currentconvolution + ")");
     }
     fill(0);
     text("fps: " + frate, 10, 20);
   }
   else{
     filter(embossShader);
+
     fcount += 1;
     int m = millis();
     if (m - lastm > 1000 * fint) {
       frate = float(fcount) / fint;
       fcount = 0;
       lastm = m;
-      println("fps: " + frate);
+      println("fps: " + frate + "  It: " + n + "  Hardware(" + currentconvolution + ")");
     }
   }
 }
