@@ -14,7 +14,7 @@ convolution kernels.
 ## IMPLEMENTATION
 1. It is going to be used this image.
 ![Graffity made in Bogota City](http://www.lurebogota.com/wp-content/uploads/2016/07/13323223_1055869174493781_8328483182648407879_o.jpg)
-2. For hardware, it is going to be used convolution kernels with 3x3 Matrix.
+2. For hardware, it is going to be used convolution kernels with matrix of any size. Many others convolution kernesl, can be found [here](http://lodev.org/cgtutor/filtering.html#Conclusion)
 
 3. For software, it is going to be used edegsfrag.glsl and embossfrag.gsls in order to process images
 with the GPU.
