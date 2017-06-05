@@ -6,13 +6,12 @@
 * CODE AVAILABLE HERE: https://processing.org/examples/convolution.html
 */
 PImage img;
-int w = 240;
-boolean hw = true;
+boolean sw = true, applyFilter = false;
 int currentconvolution = 1;
 PShader selShader;
 int fcount, lastm;
 float frate;
-int fint = 3;
+int fint = 3, n = 1;
 
 int convolutionSW = 3;
 float[][] edgesColor = {{ -1, -1, -1 }, { -1,  9, -1 }, { -1, -1, -1 }};
@@ -35,20 +34,26 @@ void setup() {
 
 void draw() {
   image(img, 0, 0);
-  if(hw) convolutionHW();
-  else convolutionSW();
+  if(applyFilter){
+    if(sw) convolutionSW();
+    else convolutionHW();
+  }
 }
 
 void keyPressed() {
   if (key == ' '){
-    if (hw) currentconvolution = currentconvolution < convolutionSW ? currentconvolution+1 : 1;
+    if (sw) currentconvolution = currentconvolution < convolutionSW ? currentconvolution+1 : 1;
     else currentconvolution = currentconvolution < convolutionHW ? currentconvolution+1 : 1;
   }
-  if (key == 's' || key == 'S')
-  hw = !hw;
+  if(key == 's' || key == 'S')
+    sw = !sw;
 }
 
-void convolutionHW(){
+void mousePressed() {
+  applyFilter = !applyFilter;
+}
+
+void convolutionSW(){
   resetShader();
   int matrixsize = 3;
   loadPixels();
@@ -68,8 +73,6 @@ void convolutionHW(){
     lastm = m;
     println("fps: " + frate);
   }
-  fill(0);
-  text("fps: " + frate, 10, 20);
 }
 
 
@@ -115,17 +118,29 @@ color convolution(int x, int y, float[][] edgesColor, int matrixsize, PImage img
   return color(rtotal, gtotal, btotal);
 }
 
-void convolutionSW() {
-  if(currentconvolution == 1) shader(edgesShader);
-  else shader(embossShader);
-  fcount += 1;
-  int m = millis();
-  if (m - lastm > 1000 * fint) {
-    frate = float(fcount) / fint;
-    fcount = 0;
-    lastm = m;
-    println("fps: " + frate);
+void convolutionHW() {
+  if(currentconvolution == 1){
+    filter(edgesShader);
+    fcount += 1;
+    int m = millis();
+    if (m - lastm > 1000 * fint) {
+      frate = float(fcount) / fint;
+      fcount = 0;
+      lastm = m;
+      println("fps: " + frate);
+    }
+    fill(0);
+    text("fps: " + frate, 10, 20);
   }
-  fill(0);
-  text("fps: " + frate, 10, 20);
+  else{
+    filter(embossShader);
+    fcount += 1;
+    int m = millis();
+    if (m - lastm > 1000 * fint) {
+      frate = float(fcount) / fint;
+      fcount = 0;
+      lastm = m;
+      println("fps: " + frate);
+    }
+  }
 }
